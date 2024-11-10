@@ -1,14 +1,21 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
+import Form from "./Components/Form";
+import Lists from "./Components/Lists";
+import Navigation from "./customer/components/Navigation/Navigation";
+import HomePage from "./customer/Pages/HomePage/HomePage";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
-      <h1>hi my fellow developers</h1>
+      <div>
+        <Navigation />
+        <HomePage />
+      </div>
+      <div>
+        <h1 className="text-3xl font-bold underline">Hello world!</h1>
+        <Form />
+        <Lists />
+      </div>
     </>
   );
 }

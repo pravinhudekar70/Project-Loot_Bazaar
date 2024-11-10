@@ -1,5 +1,5 @@
 {
-  "name": "loot_bazaar",
+  "name": "loot_bazar",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,11 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^6.1.4",
-    "@mui/material": "^6.1.4",
+    "@headlessui/react": "^2.1.10",
+    "@heroicons/react": "^2.1.5",
     "react": "^18.3.1",
+    "react-alice-carousel": "^2.9.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
