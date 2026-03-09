@@ -10,12 +10,15 @@ import com.ecom.repository.CategoryRepo;
 import com.ecom.repository.ProductRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -30,6 +33,11 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private FileService fileService;
+
+    @Value("${project.image}")
+    private String path;
 
     @Override
     public ProductDTO addProduct(ProductDTO productDTO, Long categoryId) {
@@ -37,13 +45,19 @@ public class ProductServiceImpl implements ProductService{
                new ResourceNotFoundException("Category","CategoryId",categoryId));
 
         Product product = modelMapper.map(productDTO,Product.class);
-        if(product.getCategory()!=category){
-            product.setCategory(category);
+        boolean isProductPresent = productRepo.existsByProductNameIgnoreCase(product.getProductName());
+        if(!isProductPresent){
+            if(product.getCategory()!=category){
+                product.setCategory(category);
+            }
+            product.setImage("default.png");
+            double specialPrice = product.getPrice()-((product.getDiscount()*0.01)* product.getPrice());
+            product.setSpecialPrice(specialPrice);
+            return modelMapper.map(productRepo.save(product),ProductDTO.class);
+        } else {
+            throw new ApiException("Product is already exists !!!");
         }
-        product.setImage("default.png");
-        double specialPrice = product.getPrice()-((product.getDiscount()*0.01)* product.getPrice());
-        product.setSpecialPrice(specialPrice);
-        return modelMapper.map(productRepo.save(product),ProductDTO.class);
+
     }
 
     @Override
@@ -145,4 +159,15 @@ public class ProductServiceImpl implements ProductService{
         productRepo.delete(product);
         return modelMapper.map(product,ProductDTO.class) ;
     }
+
+    @Override
+    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
+        Product product = productRepo.findById(productId).orElseThrow(()->
+                new ResourceNotFoundException("product","productId",productId));
+                    String fileName = fileService.uploadImage(path,image);
+                    product.setImage(fileName);
+                    Product updatedProduct = productRepo.save(product);
+        return modelMapper.map(updatedProduct,ProductDTO.class);
+    }
+
 }
